@@ -8,6 +8,7 @@ bool encode = false; // 0 For decoding; 1 For encoding
 int grill_size[2][1] = {{10},{10}};
 int key_size = 10;
 string phrase, filename, ifilename;
+char alphabet[] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
 
 
 
@@ -71,6 +72,14 @@ int checkValues() {
     return 0;
 }
 
+int doEncoding() {
+    return 0;
+}
+
+int doDecoding() {
+    return 0;
+}
+
 int main(int argc, char ** argv) {
     getValues(argc, argv);
     if (checkValues()) {
@@ -84,5 +93,7 @@ int main(int argc, char ** argv) {
     cout << "Phrase: " << phrase << endl;
     cout << "Output filename: " << filename << endl;
     cout << "Input filename: " << ifilename << endl;
+    if (encode) doEncoding();
+    else doDecoding();
     return 0;
 }
