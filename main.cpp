@@ -1,13 +1,14 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <ctime>
 
 using namespace std;
 
 bool encode = false; // 0 For decoding; 1 For encoding
 int grill_size[2][1] = {{10},{10}};
 int key_size = 10;
-string phrase, filename, ifilename;
+string phrase, filename, ifilename, keyfile;
 char alphabet[] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
 
 
@@ -25,6 +26,7 @@ void help () {
     cout << "-ph/-phrase <phrase>\tInput phrase to encode manually (only for encoding)" << endl;
     cout << "-f <filename>\tFile for output" << endl;
     cout << "-if <filename>\tFile for input" << endl;
+    cout << "-k/-key <filename>\tFile with key" << endl;
 }
 
 void getValues(int argc, char ** argv) {
@@ -62,6 +64,8 @@ void getValues(int argc, char ** argv) {
         cin >> ifilename;
         cout << "Enter output filename: ";
         cin >> filename;
+        cout << "Enter filename for keyfile: ";
+        cin >> keyfile;
     }
 }
 
@@ -72,20 +76,49 @@ int checkValues() {
     return 0;
 }
 
-int generateKey() {
+int ** generateKey() {
     int ** Key;
     Key = new int * [key_size];
     for (int i = 0; i < key_size; i ++) {
         Key[i] = new int[key_size];
+        for (int j = 0; j < key_size; j ++) {
+            Key[i][j] = rand() % 2;
+        }
     }
+    return Key;
+}
+
+int ** readKey(fstream key) {
+    int ** Key;
+    // Read key
+    return Key;
 }
 
 int doEncoding() {
-    generateKey();
+    fstream output;
+    fstream key;
+    ifstream input;
+
+    output.open(filename, ios::out);
+
+    key.open(keyfile, ios::in);
+
+    if (!key) {
+        key.close();
+        key.open(keyfile, ios::app);
+        int ** Key = generateKey();
+        for (int i = 0; i < key_size; i ++)
+            for (int j = 0; j < key_size; j ++)
+
+    } else {
+        int ** Key = readKey(key);
+    }
+
     return 0;
 }
 
 int doDecoding() {
+    int ** key = readKey();
     return 0;
 }
 
@@ -102,6 +135,7 @@ int main(int argc, char ** argv) {
     cout << "Phrase: " << phrase << endl;
     cout << "Output filename: " << filename << endl;
     cout << "Input filename: " << ifilename << endl;
+    cout << "Key filename: " << keyfile << endl;
     if (encode) doEncoding();
     else doDecoding();
     return 0;
