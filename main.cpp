@@ -72,7 +72,16 @@ int checkValues() {
     return 0;
 }
 
+int generateKey() {
+    int ** Key;
+    Key = new int * [key_size];
+    for (int i = 0; i < key_size; i ++) {
+        Key[i] = new int[key_size];
+    }
+}
+
 int doEncoding() {
+    generateKey();
     return 0;
 }
 
