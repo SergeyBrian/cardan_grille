@@ -1,0 +1,3 @@
+C:/Users/sergio/Projects/cardan_grille/cmake-build-debug/CMakeFiles/cardan_grille.dir
+C:/Users/sergio/Projects/cardan_grille/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/sergio/Projects/cardan_grille/cmake-build-debug/CMakeFiles/rebuild_cache.dir
