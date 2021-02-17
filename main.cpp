@@ -35,6 +35,7 @@ void help () {
     cout << "-f <filename>\tFile for output" << endl;
     cout << "-if <filename>\tFile for input" << endl;
     cout << "-k/-key <filename>\tFile with key" << endl;
+    exit(0);
 }
 
 void printKey (int ** Key) {
@@ -62,6 +63,7 @@ void getValues(int argc, char ** argv) {
             if (argvs == "-ph"||argvs=="-phrase") phrase = argv[i+1];
             if (argvs == "-f") filename = argv[i+1];
             if (argvs == "-if") ifilename = argv[i+1];
+            if (argvs == "-k" || argvs == "-key") keyfile = argv[i+1];
         }
     } else {
         cout << "Do encoding or decoding? [1 for decoding, 2 for encoding]: ";
@@ -163,7 +165,6 @@ int ** generateKey() {
         // Check if coords are empty
         if (Key[x][y] == 0) {
             numberOfCutouts ++;
-            cout << endl << numberOfCutouts << endl;
 
             Key[x][y] = 1;
             // Get all forbidden coords
@@ -192,16 +193,39 @@ int ** generateKey() {
         }
     }
 
-    cout << "Generated key: ";
+    // Remove temporary data
+    for (int i = 0; i < key_size; i ++)
+        for (int j = 0; j < key_size; j ++)
+            if (Key[i][j] == -1) Key[i][j] = 0;
+    cout << "Generated key: " << endl;
     printKey(Key);
     return Key;
 }
 
-//int ** readKey(fstream key) {
-//    int ** Key;
-//    // Read key
-//    return Key;
-//}
+int ** readKey() {
+    fstream key;
+    key.open(keyfile, ios::in);
+    string ksz;
+    getline(key, ksz);
+    string noFormatKey;
+    getline(key,noFormatKey);
+    key_size = stoi(ksz);
+
+    int ** Key = new int * [key_size];
+    initKey(Key);
+
+    int cursor = 0;
+    for (int i = 0; i < key_size; i ++) {
+        for (int j = 0; j < key_size; j ++) {
+            Key[i][j] = noFormatKey[cursor] - '0';
+            cursor ++;
+        }
+    }
+
+    printKey(Key);
+
+    return Key;
+}
 
 int doEncoding() {
     cout << "Encoding message..." << endl;
@@ -223,7 +247,7 @@ int doEncoding() {
             for (int j = 0; j < key_size; j ++)
                 key << Key[i][j];
     } else {
-//        int ** Key = readKey(key);
+        int ** Key = readKey();
     }
 
     return 0;
