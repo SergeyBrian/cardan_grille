@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/cardan_grille.dir/main.cpp.o"
-  "cardan_grille"
+  "CMakeFiles/cardan_grille.dir/main.cpp.obj"
+  "cardan_grille.exe"
+  "cardan_grille.exe.manifest"
+  "cardan_grille.lib"
   "cardan_grille.pdb"
 )
 

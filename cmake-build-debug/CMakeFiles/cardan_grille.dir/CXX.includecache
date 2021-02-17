@@ -6,11 +6,13 @@
 
 #IncludeRegexTransform: 
 
-/home/sergio/Projects/cardan_grille/main.cpp
+C:/Users/sergio/Projects/cardan_grille/main.cpp
 iostream
 -
 string
 -
 fstream
+-
+ctime
 -
 

@@ -29,6 +29,15 @@ void help () {
     cout << "-k/-key <filename>\tFile with key" << endl;
 }
 
+void printKey (int ** Key) {
+    cout<< "Key" << endl;
+    for (int i = 0; i < key_size; i ++) {
+        for (int j = 0; j < key_size; j++)
+            cout << Key[i][j] << "\t";
+        cout << endl;
+    }
+}
+
 void getValues(int argc, char ** argv) {
     if (argc > 1) {
         for (int i = 0; i < argc; i ++) {
@@ -73,10 +82,65 @@ int checkValues() {
     if (grill_size[0][0] < key_size || grill_size[1][0] < key_size) return 1;
     if (key_size < 3) return 2;
     if (!encode && phrase.length()) return 3;
+    if (!key_size % 2) return 4;
     return 0;
 }
 
+int flipV (int ** Key) {
+    for (int i = 0; i < key_size; i ++) {
+        int start = 0, end = key_size-1;
+        while (start < end) {
+            int tmp = Key[i][start];
+            Key[i][start] = Key[i][end];
+            Key[i][end] = tmp;
+            start ++;
+            end --;
+        }
+    }
+    return 0;
+}
+
+int flipH (int ** Key) {
+    int ** tmp = new int * [key_size];
+    for (int i = 0; i < key_size; i ++) {
+        tmp[i] = new int[key_size];
+        for (int j = 0; j < key_size; j ++) {
+            tmp[i][j] = Key[j][i];
+        }
+    }
+    flipV(tmp);
+    for (int i = 0; i < key_size; i ++) {
+        for (int j = 0; j < key_size; j ++) {
+            Key[i][j] = tmp[j][i];
+        }
+    }
+
+    for (int i = 0; i < key_size; i ++)
+        delete [] tmp[i];
+    delete [] tmp;
+    return 0;
+}
+
+//int rotateKey (int position, int ** Key) {
+//    switch (position) {
+//        case 1:
+//            flipH(Key);
+//            break;
+//        case 2:
+//            flipV(Key);
+//            break;
+//    }
+//}
+
 int ** generateKey() {
+    cout << "Generating new key with size " << key_size << " for phrase length " << phrase.length() << endl;
+    int numberOfCutouts = phrase.length()/4;
+    int maxCutOuts = key_size*key_size/4;
+    if (numberOfCutouts > maxCutOuts) {
+        cout << "Error! Your message is too long for given key size!" << endl;
+        cout << "Recommended key size for this message: " << numberOfCutouts*4/key_size << endl;
+        exit(1);
+    }
     int ** Key;
     Key = new int * [key_size];
     for (int i = 0; i < key_size; i ++) {
@@ -95,6 +159,7 @@ int ** readKey(fstream key) {
 }
 
 int doEncoding() {
+    cout << "Encoding message..." << endl;
     fstream output;
     fstream key;
     ifstream input;
@@ -104,21 +169,23 @@ int doEncoding() {
     key.open(keyfile, ios::in);
 
     if (!key) {
+        cout << "No existing key found! Creating a new one" << endl;
         key.close();
         key.open(keyfile, ios::app);
         int ** Key = generateKey();
+        key << key_size << "\n";
         for (int i = 0; i < key_size; i ++)
             for (int j = 0; j < key_size; j ++)
-
+                key << Key[i][j];
     } else {
-        int ** Key = readKey(key);
+//        int ** Key = readKey(key);
     }
 
     return 0;
 }
 
 int doDecoding() {
-    int ** key = readKey();
+//    int ** key = readKey();
     return 0;
 }
 
@@ -136,7 +203,15 @@ int main(int argc, char ** argv) {
     cout << "Output filename: " << filename << endl;
     cout << "Input filename: " << ifilename << endl;
     cout << "Key filename: " << keyfile << endl;
-    if (encode) doEncoding();
-    else doDecoding();
+//    if (encode) doEncoding();
+//    else doDecoding();
+    int ** Key = generateKey();
+    printKey(Key);
+    cout << endl << endl;
+    flipV(Key);
+    printKey(Key);
+    cout << endl << endl;
+    flipH(Key);
+    printKey(Key);
     return 0;
 }
