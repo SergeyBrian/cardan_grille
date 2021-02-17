@@ -10,12 +10,15 @@ int grill_size[2][1] = {{10},{10}};
 int key_size = 10;
 string phrase, filename, ifilename, keyfile;
 char alphabet[] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
-
-int ** Key2, ** Key3, ** Key4;
-
 void initKey (int ** Key) {
-    Key = new int * [key_size];
     for (int i = 0 ; i < key_size ; i ++) Key[i]=new int[key_size];
+}
+
+void initKey (int ** Key, int fill) {
+    for (int i = 0 ; i < key_size ; i ++) {
+        Key[i]=new int[key_size];
+        for (int j = 0; j < key_size; j ++) Key[i][j] = fill;
+    }
 }
 
 void help () {
@@ -35,7 +38,6 @@ void help () {
 }
 
 void printKey (int ** Key) {
-    cout<< "Key" << endl;
     for (int i = 0; i < key_size; i ++) {
         for (int j = 0; j < key_size; j++)
             cout << Key[i][j] << "\t";
@@ -133,60 +135,73 @@ void eq (int ** KeyA, int ** KeyB) {
 
 int ** generateKey() {
     cout << "Generating new key with size " << key_size << " for phrase length " << phrase.length() << endl;
-    int neededCutouts = phrase.length() / 4;
+    int neededCutouts = (phrase.length() / 4) + 1;
     int maxCutOuts = key_size*key_size/4;
+    cout << endl << "Needed cutouts: " << neededCutouts << endl;
+    cout << endl << "Max cutouts: " << maxCutOuts << endl;
+
     if (neededCutouts > maxCutOuts) {
         cout << "Error! Your message is too long for given key size!" << endl;
         cout << "Recommended key size for this message: " << neededCutouts * 4 / key_size << endl;
         exit(1);
     }
-    int ** Key;
-    Key = new int * [key_size];
+    int ** Key = new int * [key_size];
+    int ** Key2 = new int * [key_size];
+    int ** Key3 = new int * [key_size];
+    int ** Key4 = new int * [key_size];
+
+    initKey(Key, 0);
     initKey(Key2);
     initKey(Key3);
     initKey(Key4);
 
     int numberOfCutouts = 0;
-
     while (neededCutouts > numberOfCutouts) {
-        cout << numberOfCutouts;
-        for (int i = 0; i < key_size; i ++) {
-            Key[i] = new int[key_size];
-            for (int j = 0; j < key_size; j ++) {
-                int r = rand() % 2;
-                cout << Key[i][j];
-                if (r && !Key2[i][j] && !Key3[i][j] && !Key4[i][j]) {
-                    eq(Key2, Key);
-                    eq(Key3, Key2);
-                    eq(Key4, Key3);
-                    Key[i][j] = 1;
-                    Key2[i][j] = 1;
-                    Key3[i][j] = 1;
-                    Key4[i][j] = 1;
-                    flipV(Key2);
-                    flipV(Key3);
-                    flipV(Key4);
+        // Generate random coords
+        int x = rand() % key_size;
+        int y = rand() % key_size;
+        // Check if coords are empty
+        if (Key[x][y] == 0) {
+            numberOfCutouts ++;
+            cout << endl << numberOfCutouts << endl;
 
-                    flipH(Key3);
-                    flipH(Key4);
+            Key[x][y] = 1;
+            // Get all forbidden coords
 
-                    flipV(Key4);
+            eq(Key2, Key);
+            eq(Key3, Key);
+            eq(Key4, Key);
 
-                    numberOfCutouts++;
+            flipV(Key2);
+            flipV(Key3);
+            flipV(Key4);
+
+            flipH(Key3);
+            flipH(Key4);
+
+            flipV(Key4);
+
+
+            // Write forbidden coords to the key
+            for (int i = 0; i < key_size; i ++)
+                for (int j = 0; j < key_size; j ++) {
+                    if (Key2[i][j] == 1) Key[i][j] = -1;
+                    if (Key3[i][j] == 1) Key[i][j] = -1;
+                    if (Key4[i][j] == 1) Key[i][j] = -1;
                 }
-            }
         }
     }
+
     cout << "Generated key: ";
     printKey(Key);
     return Key;
 }
 
-int ** readKey(fstream key) {
-    int ** Key;
-    // Read key
-    return Key;
-}
+//int ** readKey(fstream key) {
+//    int ** Key;
+//    // Read key
+//    return Key;
+//}
 
 int doEncoding() {
     cout << "Encoding message..." << endl;
