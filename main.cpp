@@ -227,6 +227,18 @@ int ** readKey() {
     return Key;
 }
 
+void hideMessage(char ** message, int ** Key, int * c) {
+    for (int i = 0; i < key_size; i ++) {
+        for (int j = 0; j < key_size; j ++) {
+            if (Key[i][j] == 1) {
+                message[i][j] = phrase[*c];
+                *c += 1;
+                if (*c >= phrase.length() - 2) return;
+            }
+        }
+    }
+}
+
 int doEncoding() {
     cout << "Encoding message..." << endl;
     fstream output;
@@ -237,19 +249,53 @@ int doEncoding() {
 
     key.open(keyfile, ios::in);
 
+    char ** message = new char * [grill_size[0][0]];
+
+    int ** Key;
     if (!key) {
         cout << "No existing key found! Creating a new one" << endl;
         key.close();
         key.open(keyfile, ios::app);
-        int ** Key = generateKey();
+        Key = generateKey();
         key << key_size << "\n";
         for (int i = 0; i < key_size; i ++)
             for (int j = 0; j < key_size; j ++)
                 key << Key[i][j];
     } else {
-        int ** Key = readKey();
+        cout << "Using key from file " << keyfile << endl;
+        Key = readKey();
     }
 
+    for (int i = 0; i < grill_size[0][0]; i ++) {
+        message[i] = new char [grill_size[1][0]];
+        for (int j = 0; j < grill_size[1][0]; j  ++) {
+            message[i][j] = alphabet[rand() % 26];
+            cout<<message[i][j];
+        }
+        cout << endl;
+    }
+
+    int c = 0;
+    hideMessage(message, Key, &c);
+    flipV(Key);
+    cout << endl;
+    printKey(Key);
+    cout << endl;
+    hideMessage(message, Key, &c);
+    flipH(Key);
+    printKey(Key);
+    cout << endl;
+    hideMessage(message, Key, &c);
+    flipV(Key);
+    printKey(Key);
+    cout << endl;
+    hideMessage(message, Key, &c);
+
+    for (int i = 0; i < grill_size[0][0]; i ++) {
+        for (int j = 0; j < grill_size[0][0]; j++)
+            cout << message[i][j];
+        cout << endl;
+    }
     return 0;
 }
 
