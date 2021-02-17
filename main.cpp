@@ -11,7 +11,12 @@ int key_size = 10;
 string phrase, filename, ifilename, keyfile;
 char alphabet[] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
 
+int ** Key2, ** Key3, ** Key4;
 
+void initKey (int ** Key) {
+    Key = new int * [key_size];
+    for (int i = 0 ; i < key_size ; i ++) Key[i]=new int[key_size];
+}
 
 void help () {
     cout << "Cardan grille encoder/decoder" << endl;
@@ -121,34 +126,59 @@ int flipH (int ** Key) {
     return 0;
 }
 
-//int rotateKey (int position, int ** Key) {
-//    switch (position) {
-//        case 1:
-//            flipH(Key);
-//            break;
-//        case 2:
-//            flipV(Key);
-//            break;
-//    }
-//}
+void eq (int ** KeyA, int ** KeyB) {
+    for (int i = 0 ; i < key_size ; i ++)
+        for (int j = 0; j < key_size ; j ++) KeyA[i][j] = KeyB[i][j];
+}
 
 int ** generateKey() {
     cout << "Generating new key with size " << key_size << " for phrase length " << phrase.length() << endl;
-    int numberOfCutouts = phrase.length()/4;
+    int neededCutouts = phrase.length() / 4;
     int maxCutOuts = key_size*key_size/4;
-    if (numberOfCutouts > maxCutOuts) {
+    if (neededCutouts > maxCutOuts) {
         cout << "Error! Your message is too long for given key size!" << endl;
-        cout << "Recommended key size for this message: " << numberOfCutouts*4/key_size << endl;
+        cout << "Recommended key size for this message: " << neededCutouts * 4 / key_size << endl;
         exit(1);
     }
     int ** Key;
     Key = new int * [key_size];
-    for (int i = 0; i < key_size; i ++) {
-        Key[i] = new int[key_size];
-        for (int j = 0; j < key_size; j ++) {
-            Key[i][j] = rand() % 2;
+    initKey(Key2);
+    initKey(Key3);
+    initKey(Key4);
+
+    int numberOfCutouts = 0;
+
+    while (neededCutouts > numberOfCutouts) {
+        cout << numberOfCutouts;
+        for (int i = 0; i < key_size; i ++) {
+            Key[i] = new int[key_size];
+            for (int j = 0; j < key_size; j ++) {
+                int r = rand() % 2;
+                cout << Key[i][j];
+                if (r && !Key2[i][j] && !Key3[i][j] && !Key4[i][j]) {
+                    eq(Key2, Key);
+                    eq(Key3, Key2);
+                    eq(Key4, Key3);
+                    Key[i][j] = 1;
+                    Key2[i][j] = 1;
+                    Key3[i][j] = 1;
+                    Key4[i][j] = 1;
+                    flipV(Key2);
+                    flipV(Key3);
+                    flipV(Key4);
+
+                    flipH(Key3);
+                    flipH(Key4);
+
+                    flipV(Key4);
+
+                    numberOfCutouts++;
+                }
+            }
         }
     }
+    cout << "Generated key: ";
+    printKey(Key);
     return Key;
 }
 
@@ -203,15 +233,7 @@ int main(int argc, char ** argv) {
     cout << "Output filename: " << filename << endl;
     cout << "Input filename: " << ifilename << endl;
     cout << "Key filename: " << keyfile << endl;
-//    if (encode) doEncoding();
-//    else doDecoding();
-    int ** Key = generateKey();
-    printKey(Key);
-    cout << endl << endl;
-    flipV(Key);
-    printKey(Key);
-    cout << endl << endl;
-    flipH(Key);
-    printKey(Key);
+    if (encode) doEncoding();
+    else doDecoding();
     return 0;
 }
