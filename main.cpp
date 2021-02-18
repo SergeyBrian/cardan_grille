@@ -23,15 +23,13 @@ void initKey (int ** Key, int fill) {
 
 void help () {
     cout << "Cardan grille encoder/decoder" << endl;
-    cout << endl << "Use syntax <action> [params] <filename>" << endl;
-    cout << "Actions:" << endl;
+    cout << "Params:" << endl;
     cout << "-d\tDecode" << endl;
     cout << "-e\tEncode" << endl;
     cout << "-h\tHelp" << endl << endl;
-    cout << "Params:" << endl;
     cout << "-s/-size <x> <y>\tChoose size of grill's sides" << endl;
     cout << "-ks/-key-size <a>\tChoose size of key's side" << endl;
-    cout << "-ph/-phrase <phrase>\tInput phrase to encode manually (only for encoding)" << endl;
+    cout << "-ph/-phrase <phrase>\tPhrase to encode" << endl;
     cout << "-o <filename>\tFile for output" << endl;
     cout << "-i <filename>\tFile for input" << endl;
     cout << "-k/-key <filename>\tFile with key" << endl;
@@ -48,43 +46,24 @@ void printKey (int ** Key) {
 
 void getValues(int argc, char ** argv) {
     if (argc > 1) {
-        for (int i = 0; i < argc; i ++) {
+        for (int i = 0; i < argc; i++) {
             string argvs = argv[i];
-            if (argc == i-1) filename = argvs;
+            if (argc == i - 1) filename = argvs;
 
             if (argvs == "-h") help();
             if (argvs == "-d") encode = false;
             if (argvs == "-e") encode = true;
             if (argvs == "-s" || argvs == "-size") {
-                grill_size[0][0] = stoi(argv[i+1]);
-                grill_size[1][0] = stoi(argv[i+2]);
+                grill_size[0][0] = stoi(argv[i + 1]);
+                grill_size[1][0] = stoi(argv[i + 2]);
             }
-            if (argvs == "-ks"||argvs=="-key-size") key_size = stoi(argv[i+1]);
-            if (argvs == "-ph"||argvs=="-phrase") phrase = argv[i+1];
-            if (argvs == "-o") filename = argv[i+1];
-            if (argvs == "-i") ifilename = argv[i+1];
-            if (argvs == "-k" || argvs == "-key") keyfile = argv[i+1];
+            if (argvs == "-ks" || argvs == "-key-size") key_size = stoi(argv[i + 1]);
+            if (argvs == "-ph" || argvs == "-phrase") phrase = argv[i + 1];
+            if (argvs == "-o") filename = argv[i + 1];
+            if (argvs == "-i") ifilename = argv[i + 1];
+            if (argvs == "-k" || argvs == "-key") keyfile = argv[i + 1];
         }
-    } else {
-        cout << "Do encoding or decoding? [1 for decoding, 2 for encoding]: ";
-        int de;
-        cin >> de;
-        encode = de-1;
-        cout << "Enter grill sides (x and y): ";
-        cin >> grill_size[0][0] >> grill_size[1][0];
-        cout << "Enter key side: ";
-        cin >> key_size;
-        if (encode) {
-            cout << "Enter phrase to encode (optional):";
-            cin >> phrase;
-        }
-        cout << "Enter input filename: ";
-        cin >> ifilename;
-        cout << "Enter output filename: ";
-        cin >> filename;
-        cout << "Enter filename for keyfile: ";
-        cin >> keyfile;
-    }
+    } else help();
 }
 
 int checkValues() {
@@ -193,6 +172,16 @@ int ** generateKey() {
         }
     }
 
+    for (int i = 0; i < key_size; i ++) {
+        delete [] Key2[i];
+        delete [] Key3[i];
+        delete [] Key4[i];
+    }
+    delete [] Key2;
+    delete [] Key3;
+    delete [] Key4;
+
+
     // Remove temporary data
     for (int i = 0; i < key_size; i ++)
         for (int j = 0; j < key_size; j ++)
@@ -255,6 +244,8 @@ int doEncoding() {
     fstream output;
     fstream key;
     ifstream input;
+    if (!filename.length()) filename = "out.txt";
+    if (!keyfile.length()) keyfile = "key.txt";
 
     output.open(filename, ios::out);
 
@@ -319,15 +310,17 @@ int doDecoding() {
 
     msg.clear();
     msg.seekg(0);
-
+    char c;
     message = new char * [x];
     for (int i = 0; i < x; i ++) {
         message[i] = new char [y];
         for (int j = 0; j < y; j ++) {
-            msg >> message[i][j];
-            cout << message[i][j];
+            msg >> noskipws >> c;
+            if (c != '\n') message[i][j] = c;
+            else j--;
+            cout << c;
         }
-        cout << endl;
+//        cout << endl;
     }
     phrase = string(key_size*key_size, ' ');
     int cursor = 0;
@@ -341,7 +334,7 @@ int doDecoding() {
     flipV(Key);
     findMessage(message, Key, &cursor);
 
-    cout << phrase;
+    cout << endl << phrase;
 
     return 0;
 }
