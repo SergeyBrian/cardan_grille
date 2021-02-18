@@ -233,7 +233,18 @@ void hideMessage(char ** message, int ** Key, int * c) {
             if (Key[i][j] == 1) {
                 message[i][j] = phrase[*c];
                 *c += 1;
-                if (*c >= phrase.length() - 2) return;
+                if (*c >= phrase.length()) return;
+            }
+        }
+    }
+}
+
+void findMessage(char ** message, int ** Key, int * c) {
+    for (int i = 0; i < key_size; i ++) {
+        for (int j = 0; j < key_size; j ++) {
+            if (Key[i][j] == 1) {
+                phrase[*c] = message[i][j];
+                *c += 1;
             }
         }
     }
@@ -306,6 +317,9 @@ int doDecoding() {
         y = tmp.length();
     }
 
+    msg.clear();
+    msg.seekg(0);
+
     message = new char * [x];
     for (int i = 0; i < x; i ++) {
         message[i] = new char [y];
@@ -315,6 +329,19 @@ int doDecoding() {
         }
         cout << endl;
     }
+    phrase = string(key_size*key_size, ' ');
+    int cursor = 0;
+
+
+    findMessage(message, Key, &cursor);
+    flipV(Key);
+    findMessage(message, Key, &cursor);
+    flipH(Key);
+    findMessage(message, Key, &cursor);
+    flipV(Key);
+    findMessage(message, Key, &cursor);
+
+    cout << phrase;
 
     return 0;
 }
