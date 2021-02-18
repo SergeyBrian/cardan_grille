@@ -33,6 +33,7 @@ void help () {
     cout << "-o <filename>\tFile for output" << endl;
     cout << "-i <filename>\tFile for input" << endl;
     cout << "-k/-key <filename>\tFile with key" << endl;
+    cout << "-no-random\tDon't use randomness" << endl;
     exit(0);
 }
 
@@ -62,6 +63,7 @@ void getValues(int argc, char ** argv) {
             if (argvs == "-o") filename = argv[i + 1];
             if (argvs == "-i") ifilename = argv[i + 1];
             if (argvs == "-k" || argvs == "-key") keyfile = argv[i + 1];
+            if (argvs == "-no-random") srand(0);
         }
     } else help();
 }
@@ -340,6 +342,7 @@ int doDecoding() {
 }
 
 int main(int argc, char ** argv) {
+    srand(time(nullptr));
     getValues(argc, argv);
     if (checkValues()) {
         cout << checkValues();
