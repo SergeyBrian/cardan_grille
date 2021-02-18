@@ -294,7 +294,28 @@ int doEncoding() {
 }
 
 int doDecoding() {
-//    int ** key = readKey();
+    cout << "Decoding message from file " << ifilename << endl;
+    cout << "Using key from file " << keyfile << endl;
+    int ** Key = readKey();
+    char ** message;
+    string tmp;
+    ifstream msg(ifilename);
+    int x = 0, y;
+    while (getline(msg, tmp)) {
+        x++;
+        y = tmp.length();
+    }
+
+    message = new char * [x];
+    for (int i = 0; i < x; i ++) {
+        message[i] = new char [y];
+        for (int j = 0; j < y; j ++) {
+            msg >> message[i][j];
+            cout << message[i][j];
+        }
+        cout << endl;
+    }
+
     return 0;
 }
 
