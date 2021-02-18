@@ -355,5 +355,6 @@ int main(int argc, char ** argv) {
     cout << "Key filename: " << keyfile << endl;
     if (encode) doEncoding();
     else doDecoding();
+    cout<<endl;
     return 0;
 }
