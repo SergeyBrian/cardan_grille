@@ -32,8 +32,8 @@ void help () {
     cout << "-s/-size <x> <y>\tChoose size of grill's sides" << endl;
     cout << "-ks/-key-size <a>\tChoose size of key's side" << endl;
     cout << "-ph/-phrase <phrase>\tInput phrase to encode manually (only for encoding)" << endl;
-    cout << "-f <filename>\tFile for output" << endl;
-    cout << "-if <filename>\tFile for input" << endl;
+    cout << "-o <filename>\tFile for output" << endl;
+    cout << "-i <filename>\tFile for input" << endl;
     cout << "-k/-key <filename>\tFile with key" << endl;
     exit(0);
 }
@@ -61,8 +61,8 @@ void getValues(int argc, char ** argv) {
             }
             if (argvs == "-ks"||argvs=="-key-size") key_size = stoi(argv[i+1]);
             if (argvs == "-ph"||argvs=="-phrase") phrase = argv[i+1];
-            if (argvs == "-f") filename = argv[i+1];
-            if (argvs == "-if") ifilename = argv[i+1];
+            if (argvs == "-o") filename = argv[i+1];
+            if (argvs == "-i") ifilename = argv[i+1];
             if (argvs == "-k" || argvs == "-key") keyfile = argv[i+1];
         }
     } else {
@@ -270,31 +270,25 @@ int doEncoding() {
         message[i] = new char [grill_size[1][0]];
         for (int j = 0; j < grill_size[1][0]; j  ++) {
             message[i][j] = alphabet[rand() % 26];
-            cout<<message[i][j];
         }
-        cout << endl;
     }
 
     int c = 0;
     hideMessage(message, Key, &c);
     flipV(Key);
-    cout << endl;
-    printKey(Key);
-    cout << endl;
     hideMessage(message, Key, &c);
     flipH(Key);
-    printKey(Key);
-    cout << endl;
     hideMessage(message, Key, &c);
     flipV(Key);
-    printKey(Key);
-    cout << endl;
     hideMessage(message, Key, &c);
 
     for (int i = 0; i < grill_size[0][0]; i ++) {
-        for (int j = 0; j < grill_size[0][0]; j++)
+        for (int j = 0; j < grill_size[0][0]; j++) {
             cout << message[i][j];
+            output << message[i][j];
+        }
         cout << endl;
+        output << endl;
     }
     return 0;
 }
