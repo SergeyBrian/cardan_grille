@@ -103,6 +103,8 @@ int checkValues() {
     if (key_size < 3) return 2;
     if (!encode && phrase.length()) return 3;
     if (!key_size % 2) return 4;
+    if (!filename.length()) filename = "out.txt";
+    if (!keyfile.length()) keyfile = "key.txt";
     return 0;
 }
 
@@ -278,8 +280,6 @@ int doEncoding() {
     fstream output;
     fstream key;
     ifstream input;
-    if (!filename.length()) filename = "out.txt";
-    if (!keyfile.length()) keyfile = "key.txt";
 
     output.open(filename, ios::out);
 
@@ -291,12 +291,15 @@ int doEncoding() {
     if (!key || force) {
         cout << "No existing key found! Creating a new one" << endl;
         key.close();
+        key.open(keyfile, ios::out);
+        key.close();
         key.open(keyfile, ios::app);
         Key = generateKey();
         key << key_size << "\n";
         for (int i = 0; i < key_size; i ++)
             for (int j = 0; j < key_size; j ++)
                 key << Key[i][j];
+        key.close();
     } else {
         cout << "Using key from file " << keyfile << endl;
         Key = readKey();
