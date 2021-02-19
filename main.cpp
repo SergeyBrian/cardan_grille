@@ -5,10 +5,10 @@
 
 using namespace std;
 
-bool encode = false;// 0 For decoding; 1 For encoding
-bool ce = false;
-int grill_size[2][1] = {{10},{10}};
-int key_size = 10;
+bool encode = true;// 0 For decoding; 1 For encoding
+bool ce = false, force = false;
+int grill_size[2][1] = {{0},{0}};
+int key_size = 0;
 string phrase, filename, ifilename, keyfile;
 char alphabet[] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
 
@@ -41,6 +41,7 @@ void help () {
     cout << "-no-random\tDon't use randomness" << endl;
     cout << "-vk/-view-key\tView any key in all positions" << endl;
     cout << "-ce/-clean-endings\tLeave endings of phrase empty" << endl;
+    cout << "-f\tForce rewrite key file (ignore any existing keys)" << endl;
     exit(0);
 }
 
@@ -79,11 +80,25 @@ void getValues(int argc, char ** argv) {
             if (argvs == "-k" || argvs == "-key") keyfile = argv[i + 1];
             if (argvs == "-no-random") srand(0);
             if (argvs == "-ce" || argvs == "-clean-endings") ce = true;
+            if (argvs == "-f") force = true;
         }
     } else help();
 }
 
 int checkValues() {
+    if (!key_size) {
+        int need = phrase.length()/4 + 1;
+        int max = 0;
+        while (max < need || (key_size%2) || key_size<=3) {
+            key_size++;
+            max = key_size*key_size/4;
+            cout << key_size << ":" << max << endl ;
+        }
+    }
+    if (!grill_size[0][0] || !grill_size[1][0]) {
+        grill_size[0][0] = key_size;
+        grill_size[1][0] = key_size;
+    }
     if (grill_size[0][0] < key_size || grill_size[1][0] < key_size) return 1;
     if (key_size < 3) return 2;
     if (!encode && phrase.length()) return 3;
@@ -273,7 +288,7 @@ int doEncoding() {
     char ** message = new char * [grill_size[0][0]];
 
     int ** Key;
-    if (!key) {
+    if (!key || force) {
         cout << "No existing key found! Creating a new one" << endl;
         key.close();
         key.open(keyfile, ios::app);
