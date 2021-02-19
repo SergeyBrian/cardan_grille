@@ -92,7 +92,6 @@ int checkValues() {
         while (max < need || (key_size%2) || key_size<=3) {
             key_size++;
             max = key_size*key_size/4;
-            cout << key_size << ":" << max << endl ;
         }
     }
     if (!grill_size[0][0] || !grill_size[1][0]) {
