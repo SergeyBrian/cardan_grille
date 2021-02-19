@@ -5,11 +5,16 @@
 
 using namespace std;
 
-bool encode = false; // 0 For decoding; 1 For encoding
+bool encode = false;// 0 For decoding; 1 For encoding
+bool ce = false;
 int grill_size[2][1] = {{10},{10}};
 int key_size = 10;
 string phrase, filename, ifilename, keyfile;
 char alphabet[] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
+
+int ** readKey();
+void viewKey(int ** Key);
+
 void initKey (int ** Key) {
     for (int i = 0 ; i < key_size ; i ++) Key[i]=new int[key_size];
 }
@@ -34,6 +39,8 @@ void help () {
     cout << "-i <filename>\tFile for input" << endl;
     cout << "-k/-key <filename>\tFile with key" << endl;
     cout << "-no-random\tDon't use randomness" << endl;
+    cout << "-vk/-view-key\tView any key in all positions" << endl;
+    cout << "-ce/-clean-endings\tLeave endings of phrase empty" << endl;
     exit(0);
 }
 
@@ -43,15 +50,22 @@ void printKey (int ** Key) {
             cout << Key[i][j] << "\t";
         cout << endl;
     }
+    cout << endl;
 }
 
 void getValues(int argc, char ** argv) {
     if (argc > 1) {
         for (int i = 0; i < argc; i++) {
             string argvs = argv[i];
-            if (argc == i - 1) filename = argvs;
+            if (argvs == "-vk" || argvs == "-view-key") {
+                keyfile = argv[i+1];
+                int ** Key = readKey();
+                viewKey(Key);
+                exit(0);
+            }
 
             if (argvs == "-h") help();
+
             if (argvs == "-d") encode = false;
             if (argvs == "-e") encode = true;
             if (argvs == "-s" || argvs == "-size") {
@@ -64,6 +78,7 @@ void getValues(int argc, char ** argv) {
             if (argvs == "-i") ifilename = argv[i + 1];
             if (argvs == "-k" || argvs == "-key") keyfile = argv[i + 1];
             if (argvs == "-no-random") srand(0);
+            if (argvs == "-ce" || argvs == "-clean-endings") ce = true;
         }
     } else help();
 }
@@ -222,9 +237,11 @@ void hideMessage(char ** message, int ** Key, int * c) {
     for (int i = 0; i < key_size; i ++) {
         for (int j = 0; j < key_size; j ++) {
             if (Key[i][j] == 1) {
-                message[i][j] = phrase[*c];
+                if (*c >= phrase.length()) {
+                    if (ce) message[i][j] = ' ';
+                    else return;
+                } else message[i][j] = phrase[*c];
                 *c += 1;
-                if (*c >= phrase.length()) return;
             }
         }
     }
@@ -339,6 +356,16 @@ int doDecoding() {
     cout << endl << phrase;
 
     return 0;
+}
+
+void viewKey (int ** Key) {
+    printKey(Key);
+    flipV(Key);
+    printKey(Key);
+    flipH(Key);
+    printKey(Key);
+    flipV(Key);
+    printKey(Key);
 }
 
 int main(int argc, char ** argv) {
